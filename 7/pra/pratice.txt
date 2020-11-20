@@ -1,0 +1,111 @@
+(7.38)
+Sales_data(std::istream &is = std::cin) { read(is, *this); }
+(7.39)
+不合法，会导致二义性
+(7.40)
+class Date {
+public:
+    Date(int y, int m, int d, string ins)
+        : year(y), month(m), day(d), instructions(ins) { }
+private:
+    int year, month, day;
+    string instructions;
+};
+(7.41)
+受委托的构造函数先执行，然后再执行委托者的构造函数
+(7.42)
+class Date {
+public:
+    Date(int y, int m, int d, string ins)
+        : year(y), month(m), day(d), instructions(ins) { }
+    Date(int y, int m, int d): Date(y, m, d, ' ') { } //委托构造函数
+private:
+    int year, month, day;
+    string instructions;
+};
+(7.43)
+class C {
+public:
+    C(int i = 0): nd(i) { }
+private:
+    NoDefault nd;
+};
+(7.44)
+不合法，因为NoDefault没有默认构造函数
+(7.45)
+合法，C有默认构造函数
+(7.46)
+(a)错误，存在默认构造函数
+(b)错误，默认构造函数也可以带参数，但必须有默认值
+(c)错误，没有默认构造函数的话，在编译器需要隐式地使用时，会无法使用
+(d)错误，内置类型和符合类型的成员只对定义在全局作用域的对象执行初始化
+(7.47)
+应该是explicit的，防止string隐式转换成Sales_data类型
+(7.48)
+string null_isbn("9-999-99999-9");//给null_isbn对象赋值
+Sales_data item1(null_isbn);
+Sales_data item2("9-999-99999-9");
+无论是否是explicit，item1和item2都会调用Sales_data(string &s)被构造成功
+(7.49)
+当调用i.combine(s)时，编译器首先用给定的string对象s创建一个临时Sales_data对象
+a>正确，生成的临时对象传给combine的形参，正确执行并返回结果
+b>错误，因为combine的参数是非常量引用，但是形参是临时对象，不能正确引用
+c>错误，尽管可以使用常量引用正确引用临时对象，但是combine函数作为常量函数，不能改变数据成员的值
+(7.50)
+当不希望出现隐式转换的时候需要加上explicit
+explicit只能出现在参数为1个或者n个参数但有n-1个参数有默认值的时候
+(7.51)
+因为vector接受的单参数是int类型，这个参数的本义是容器的大小，不可隐式转换为容器。
+(7.52)
+聚合类
+所有成员都是public
+没有定义任何构造函数
+没有类内初始值
+没有基类，也没有virtual函数
+初始化类中的所有数据成员，但是因为Sales_data的数据成员含有类内初始值，不满足条件
+应改为:
+Struct Sales_data {
+    string bookNo;
+    unsigned units_sold;
+    double revenue;
+};
+(7.53)
+class Debug {
+public:
+    constexpr Debug(bool b = true): hw(b), io(b), other(b) { }
+    constexpr Debug(bool h, bool i, bool o) : hw(h), io(i), other(o) { }
+    constexpr bool any() { return hw || io || other; }
+    void set_io(bool b) { io = b; }
+    void set_hw(bool b) { hw = b; }
+    void set_other(bool b) { other = b; }
+private:
+    bool hw;
+    bool io;
+    bool other;
+};
+(7.54)
+constexpr函数只能包含return语句，不允许执行其他任务
+(7.55)
+不是，因为string不是字面值类型
+(7.56)
+类的静态成员与类的本身直接相关，不与类的各个对象保持关联
+声明的时候需要在前面加上static
+优点：作用域在类的范围，避免名称冲突；可以是私有成员；
+与普通成员的区别：普通成员与类的对象关联，是某个具体对象的组成部分；静态成员不属于任何具体的对象，它被该类的所有对象共享；静态成员可以作为默认参数，而普通成员则不行；
+(7.57)
+class Account {
+public:
+    void calculate() { amount += amount * interestRate; }
+    static double rate() { return interestRate; }
+    static void rate(double newRate) { interestRate = newRate; }
+private:
+    std::string owner;
+    double amount;
+    static double interestRate;
+    static double initRate() { interestRate = 1.0; };
+    static constexpr int period = 30;
+    double daily_tbl[period];
+};
+(7.58)
+静态成员不应该在类的内部初始化，除了静态常量成员
+所以 rate 和 vec 不能在类内初始化。

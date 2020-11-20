@@ -1,0 +1,6 @@
+生成链接文件 .o
+g++ -c fact.cpp
+编译 factmain文件
+g++ factmain.cpp fact.o
+生成汇编文件 .s
+g++ -S factmain.cpp

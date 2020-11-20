@@ -1,0 +1,88 @@
+关联容器
+有序
+<map>
+map 关联数组,保存 关键字-值 对
+multimap 关键字可重复出现的map
+<set>
+set 关键字即值,即只保存关键字的容器
+multiset 关键字可重复出现的set
+无序
+<unordered_map>
+unordere_map 用哈希函数组织的map
+unordered_multimap 哈希组织的map:关键字可以重复出现
+<unordered_set>
+unordered_set 用哈希函数组织的map
+unordered_multiset 哈希组织的set:关键字可以重复出现
+
+类型别名
+key_type 容器的关键字类型
+mapped_type 关键字对应的类型:只适用于map
+value_type 对于set,与key_value相同
+           对于map,为pair<const key_type, mapped_type>
+
+标准库类型
+<utility>
+pair 保存两个数据成员
+pair<T1, T2> p;
+make_pair(v1, v2); 类型由v1, v2推断;
+
+关联容器迭代器的类型为 value_type
+对于map auto mi = map.begin(); mi->first;mi->second;
+对于set auto si = set.cbegin();*si;
+
+添加insert
+c.insert(v);//元素对象
+c.insert(b, e);//迭代器范围
+成功返回true,否则返回false
+删除erase
+c.erase(k);//关键字k的元素,返回size_type 删除的元素数量
+c.erase(p);//迭代器p,返回指向p之后元素的迭代器
+c.erase(b, e);//返回e
+下标操作at
+c[k];//返回关键字为k的元素,如果不存在,创建并初始化
+c.at(k);//返回关键字为k的元素,如果不存在,抛出out_of_range异常
+访问元素
+c.find(k);//返回指向第一个关键字为k的元素,若不存在返回尾后迭代器
+c.count(k);//返回关键字等于k的元素的数量.对于不允许重复的容器,返回0或1
+//不适用无序容器 lower 和 upper
+c.lower_bound(k);//返回指向第一个关键字不小于k的元素
+c.upper_bound(k);//返回指向第一个关键字大于k的元素
+c.equal_range(k);//返回一个迭代器pair,表示关键字等于k的元素的范围.若不存在,pair两个成员均等于c.end()
+eg:
+auto count = authors.count(search_item);
+auto iter = authors.find(search_item);
+while(count) {
+    cout << iter->second << endl;
+    --count;
+}
+
+for(auto beg = authors.lower_bound(search_item),
+        end = authors.upper_bound(search_item);
+        beg != end; beg++) {
+            cout << beg->second << endl;
+        }
+
+for(auto pos = authors.equal_range(search_item);
+    pos.first != pos.second; ++pos.first) {
+        cout << pos.first->second <<endl;
+    }
+
+
+自定义类型使用时
+对于有序关联容器
+//自定义排序方式
+bool compareIsbn(const Sales_data &lhs, const Sales_data &rhs) {
+    return lhs.isbn() < rhs.isbn();
+}
+multiset<Sales_data, decltype(compareIsbn)*> bookstore(compareIsbn);
+对于无序关联容器
+//自定义 == 运算符和哈希值计算函数
+size_t hasher(const Sales_data &sd) {
+    return hash<string>()(sd.isbn());
+}
+bool eqOp(const Sales_data &lhs, const Sales_data &rhs) {
+    return lhs.isbn() == rhs.isbn();
+}
+using SD_multiset = unordered_multiset<Sales_data, decltype(hasher)*, decltype(eqOp)*>;
+//桶大小,哈希函数指针,相等性判断运算符指针
+SD_multiset bookstore(42, hasher, eqOp);

@@ -1,0 +1,1 @@
+/usr/bin/c++      CMakeFiles/screen.dir/screen.o CMakeFiles/screen.dir/main.o  -o screen -rdynamic 

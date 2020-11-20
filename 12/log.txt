@@ -1,0 +1,95 @@
+前言
+
+全局对象在程序启动时分配,结束时销毁
+局部自动对象,进入块时创建,离开是销毁
+局部static对象在第一次使用前分配,程序结束时销毁
+静态内存
+保存局部static对象,类static数据成员以及定义在任何函数之外的变量
+栈内存
+保存定义在函数内的非static对象
+自由空间(堆)
+存储动态分配的对象,即在程序运行时分配的对象.其生存期由程序来控制
+
+动态管理内存
+
+1>智能指针
+<memory>
+shared_ptr 允许多个指针指向同一个对象
+unique_ptr "独占"所指向的对象
+weak_ptr 指向shared_ptr所管理的对象
+最安全的分配和使用动态内存的方法是调用一个名为make_shared的标准库函数
+在动态内存中分配一个对象并初始化它,返回指向此对象的shared_ptr
+
+2>直接管理内存
+new 在动态内存中为对象分配空间并返回一个指向该对象的指针,可以选择对象进行初始化
+delete 接受一个指针销毁对象释放内存
+
+3>shared_ptr 与 new
+shared_ptr<int> p1 = new int(1024); //错误，不能隐式转换
+shared_ptr<int> p2(new int(1024));  //正确，直接初始化
+tips:
+不要混合使用普通指针和智能指针
+不要使用get初始化另一个智能指针或为智能指针赋值
+
+利用reset将一个新的指针赋予一个shared_ptr，会更新引用计数
+
+unique_ptr<string> p1(new string("Stegosaurus"));
+unique_ptr<string> p2(p1);//错误
+unique_ptr<string> p3; p3 = p2;//错误
+
+unique_ptr<T, D> u;
+u.release(); u放弃对指针的控制权，返回指针，并将u置为空
+u.reset(); 释放u指向的对象
+u.reset(q);如果提供了内置指针q，令u指向这个对象；否则将u置为空
+
+eg：
+unique_ptr<connection, decltype(end_connection)*> p(&c, end_connection);
+
+weak_ptr 会绑定 shared_ptr 上，但是不会改变 shared_ptr 的引用计数；
+
+weak_ptr<T> w;
+w = p; //p可以是一个shared_ptr或一个weak_ptr。赋值后w与p共享对象
+w.reset(); //将w置为空
+w.use_count(); //与w共享对象的shared_ptr的数量
+w.expired(); //若w.use_count()为0,返回true,否则返回false
+w.lock(); //如果expired为true,返回一个空shared_ptr,否则返回一个指向w的对象的shared_ptr
+
+访问对象eg:
+if(shared_ptr<int> np = w.lock()) {
+    //用np访问
+}
+
+动态数组(推荐使用标准库容器)
+
+1>new和数组
+int *pia = new int[get_size()];//pia 指向第一个int, get_size()确定分配多少个int,必须是整型,不必是常量
+
+typedef int arrT[42];
+int *p = new attT;
+
+释放
+delete [] p;
+
+智能指针和动态数组
+unique_ptr<int[]> up(new int[10]);//创建
+up.release();//销毁
+当使用shared_ptr时,需要自己构建删除器才能使用
+并且在访问时,需要先用get获取内置指针,然后访问数组元素
+
+2>allocator类 (内存分配和对象构造分离)
+<memory>
+allocator<string> alloc;//分配string的allocator对象
+auto const p = alloc.allocate(n);//分配n个未初始化的string
+auto q = p;//q指向最后构造的元素之后的位置
+alloc.construct(q++);//*q为空字符串
+alloc.construct(q++, 10, 'c');//*q为cccccccccc
+alloc.construct(q++, "hi");//*q为hi
+while(q != p)
+    alloc.destory(--q);//释放对象
+alloc.deallocate(p, n);//释放内存
+
+使用拷贝和填充
+auto p = alloc.allocate(vi.size() * 2);
+auto q = uninitialized_copy(vi.begin(), vi.end(), p);//拷贝
+uninitialized_fill_n(q, vi.size(), 42);//填充
+

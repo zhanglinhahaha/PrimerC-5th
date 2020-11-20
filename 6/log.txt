@@ -1,0 +1,108 @@
+如果函数无需改变引用形参的值，最好将其声明为常量引用
+可以使用非常量初始化一个底层const对象，反之则不行
+使用数组作为形参的时候，注意两点：不允许拷贝数组，使用数组时通常会将其转换成指针
+如果要返回数组指针
+法1：使用类型别名
+typedef int arrT[10];
+using arrT = int[10];//arrT是含有10个整数的数组的别名
+arrT* func(int i);//返回的是一个指向包含10个整数的数组的指针
+法2：不使用类型别名，需要被定义的名字后面数组的维度
+Type (*function(parameter_list))[dimension]
+Type 表示元素的类型
+dimension 表示数组的大小
+eg.
+int (*func(int i))[10];
+法3 使用尾置返回类型
+auto func(int i) -> int(*)[10];
+法4 使用decltype,需要知道返回的指针将指向哪个数组
+int odd[] = {1,3,5,7,9};
+int even[] = {0,2,4,6,8};
+
+decltype(odd) *arrPtr(int i) {
+    return (i % 2) ? &odd : &even;
+}
+
+首先
+int arr[10];
+//指针p指向数组arr的首元素，p为数组首元素的地址，*p代表数组首元素的值
+int *p = arr;
+//指针q指向数组arr，(*q)[0]代表数组首元素的值
+int (*q)[10] = &arr;
+实例：
+在test.cpp
+
+内联函数(inline)和constexpr函数一般定义在头文件中
+
+assert宏常用于检查“不能发生”的条件，表达式为假，终止程序；为真则什么也不做；头文件<cassert>
+assert的行为依赖NDEBUG预处理变量的状态，如果定义了NDEBUG，则会使assert失效
+#define NDEBUG
+__func__ 当前函数名
+__FILE__ 当前文件名
+__LINE__ 当前行号
+__TIME__ 编译时间
+__DATE__ 编译日期
+
+函数匹配顺序
+1.确定候选函数和可行函数
+候选函数的特点：与调用的函数同名，其声明在调用点可见
+可行函数的特点：形参数量与本次调用提供的实参数量相等，实参的类型与对应的形参类型相同或者可转换
+2.寻找最佳匹配
+从可行函数中选择，实参类型与形参类型越接近，匹配越好，如果优先级一样，则会报二义性错误
+
+类型转换等级排序
+1.精确匹配
+实参类型与形参类型一致
+实参从数组类型或者函数类型转换成对应的指针类型
+向实参添加顶层const或者从实参中删除顶层const
+2.通过const转换实现的匹配
+3.通过类型提升实现的匹配
+小整型一般都会提升到int类型或更大的整数类型
+所有算术类型转换的级别都一样
+4.通过涮书类型转换或者指针转换实现的匹配
+5.通过类类型转换实现的匹配
+
+函数指针
+当我们把函数名作为一个值使用时，该函数自动地转换成指针
+bool lengthCompare(const string &, const string &);
+//声明一个函数指针,()必须加上，否则就不是函数指针，是一个返回类型为 bool* 的函数
+bool (*pf)(const string &, const string &);
+在使用的时候无需提前解引用
+//这三个等价
+bool b1 = pf("hello", "goodbye");
+bool b2 = (*pf)("hello", "goodbye");
+bool b3 = lengthCompare("hello", "goodbye");
+指向不同函数类型的指针建不存在转换规则，但是可以赋值为0，表示没有指向任何一个函数
+string::size_type sunLength(const string&, const string&);
+bool cstringCompare(const char*, const char*);
+pf = 0; //ok
+pf = sumLength; //error,返回类型不匹配
+pf = cstringCompare; //error,形参类型不匹配
+重载函数的指针类型必须与重载函数中的某一个精确匹配
+
+函数指针可当做函数形参，形参看起来是函数类型，实际上当成指针使用，这样可以直接把函数当作实参使用
+//两种等价的声明
+void uesBigger(const string &s1, const string &s2, bool pf(const string &, const string &));
+void uesBigger(const string &s1, const string &s2, bool (*pf)(const string &, const string &));
+//使用时
+useBigger(s1, s2, lengthCompare);
+为了时声明简洁，可以使用类型别名和decltype
+//Func和Func2是等价的两种函数类型
+typedef bool Func(const string&, const string&);
+typedef decltype(lengthCompare) Func2;
+//FuncP和FuncP2是等价的两种指向函数的指针
+typedef bool(*FuncP)(const string&, const string&);
+typedef decltype(lengthCompare) *FuncP2;
+//useBigger的等价声明
+void uesBigger(const string &, const string &, Func);
+//编译器会自动地将Func表示的函数类型转换成指针
+void uesBigger(const string &, const string &, FuncP2);
+
+返回指向函数的指针
+using F = int(int*, int);//F为函数类型
+using PF = int(*)(int*, int);//PF是指针类型,指向函数
+eg.
+PF f1(int); //ok,f1返回指向函数的指针
+F f1(int); //error,f1不能返回一个函数
+F *f1(int); //ok,显式地指定返回类型是指向函数的指针
+int (*f1(int))(int*, int); //ok,f1返回一个指针，该指针指向一个 返回int类型 的函数
+auto f1(int) -> int (*)(int*, int);//声明一个函数指针的函数

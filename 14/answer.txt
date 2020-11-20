@@ -1,0 +1,286 @@
+(14.1)
+没有区别的情况：运算符作用于类型正确的实参，如data1 + data2; operator+(data1, data2);
+有区别的情况：运算符作用于错误的实参，使用会产生error
+(14.2)
+(14.3)
+(a) const char *
+(b) string
+(c) vector
+(d) string
+(14.4)
+判定标准：
+=, [], (), ->必须是成员
+复合赋值符一般来说应该是成员，但并非必须
+改变对象状态的运算符或者与给定类型密切相关的运算符，如递增、递减和解引用，通常应该是成员
+具有对称性的运算符可能转换任意一端的运算对象，如算术、相等性、关系和位运算符等，通常应该是非成员
+通常不应该重载逗号、取地址、逻辑与和逻辑或运算符
+
+类的成员: %=, ++, ->, ()
+非类的成员: %, <<, ==
+不应该被重载: &&
+(14.5)
+class Date {
+public:
+    Date(int y, int m, int d, string ins)
+        : year(y), month(m), day(d), instructions(ins) { }
+private:
+    int year, month, day;
+    string instructions;
+};
+这个类记录了某天的日期和当天的记录
+应该需要重载 复合赋值符、相等性、关系、>>和<<运算符
+(14.6)
+ostream& operator<<(ostream &os, const Sales_data& sd) {
+    os << sd.isBn << " " << sd.price;
+    return os;
+}
+(14.7)
+ostream& operator<<(ostream &os, const String& s) {
+    os << s.p << s.sz;
+    return os;
+}
+(14.8)
+ostream& operator<<(ostream &os, const Date& d) {
+    os << d.year << "年" << d.month << "月" << d.day << "日" << " :" << d.instructions;
+    return os;
+}
+(14.9)
+当读取操作发生错误时，输入运算符应该负责从错误中恢复
+istream& operator>>(istream &is, Sales_data& sd) {
+    is >> sd.isBn >> sd.price;
+    if(!is) item = Sales_data();//输入失败，对象赋予默认的状态
+    return is;
+}
+(14.10)
+(a) 正常
+(b) 输入失败，对象将被默认初始化
+(14.11)
+没有处理输入失败的情况，输入对象参数正常时则正常，不正确时将发生错误
+(14.12)
+istream& operator>>(istream &is, Date& d) {
+    is >> d.year >> d.month << d.day << d.instructions;
+    if(!is) d = Date();//输入失败，对象赋予默认的状态
+    return is;
+}
+(14.13)
+非类成员函数
+ostream& operator<<(ostream &os, const String& s);
+istream& operator>>(istream &is, Sales_data& sd);
+Sales_data operator+(const Sales_data& lhs, const Sales_data& rhs);
+类成员函数
+Sales_data& Sales_data::operator+=(const Sales_data& rhs);
+(14.14)
++=返回的是一个引用，可以占用更少的内存
+(14.15)
+不需要，因为日期相加没有意义
+(14.16)
+就实现其中一个StrBlob，其他的都大同小异,都定义成非成员函数
+bool operator==(const StrBlob& lsb, const StrBlob& rsb);
+bool operator!=(const StrBlob& lsb, const StrBlob& rsb);
+(14.17)
+需要
+bool operator==(const Date& ld, const Date& rd) {
+    return ld.year == rd.year &&
+           ld.month == rd.month &&
+           ld.day == rd.day &&
+           ld.instructions == rd.instructions;
+}
+bool operator!=(const Date& ld, const Date& rd) {
+    return !(ld == rd);
+}
+(14.18)
+就实现其中一个StrBlob，其他的都大同小异,都定义成非成员函数
+bool operator<(const StrBlob& lsb, const StrBlob& rsb);
+bool operator>(const StrBlob& lsb, const StrBlob& rsb);
+(14.19)
+应该含有
+bool operator<(const Date& ld, const Date& rd) {
+    if(ld.year < rd.year) return true;
+    else if(ld. year > rd.year) return false;
+    else {
+        if(ld.month < rd.month) return true;
+        else if(ld.month > rd.month) return false;
+        else {
+            if(ld.day < rd.day) return true;
+            else if(ld.day > rd.day) return false;
+            else {
+                if(ld.instructions < rd.instructions) return true;
+                else return false;
+            }
+        }
+    }
+}
+bool operator>(const Date& ld, const Date& rd) {
+    return !(ld < rd) && (ld != rd);
+}
+(14.20)
+非类成员函数
+Sales_data operator+(const Sales_data& lhs, const Sales_data& rhs);
+类成员函数
+Sales_data& Sales_data::operator+=(const Sales_data& rhs);
+(14.21)
+//+调用+=
+Sales_data operator+(const Sales_data& lhs, const Sales_data& rhs) {
+    Sales_data sum = lhs;
+    sum += rhs;
+    return sum;
+}
+Sales_data& Sales_data::operator+=(const Sales_data& rhs) {
+    units_sold += rhs.units_sold;
+    revenue += rhs.revenue;
+    return *this;
+}
+//+=调用+
+Sales_data operator+(const Sales_data& lhs, const Sales_data& rhs) {
+    Sales_data sum = lhs;
+    sum.units_sold += rhs.units_sold;
+    sum.revenue += rhs.revenue;
+    return sum;
+}
+Sales_data& Sales_data::operator+=(const Sales_data& rhs) {
+    return *this + rhs;
+}
+可读性降低
+(14.22)
+Sales_data& Sales_data::operator=(const string& s) {
+    ISBN = s;
+    return *this;
+}
+(14.23)
+StrVec& StrVec::operator=(initializer_list<string> il) {
+    auto data = alloc_n_copy(il.begin(), il.end());
+    free();
+    elements = data.first;
+    first_free = cap = data.second;
+    return *this;
+}
+(14.24)
+不需要
+(14.25)
+不需要
+(14.26)
+如果一个类包含下标运算符，通常会定义两个版本：
+一个返回普通引用，一个是类的常量成员并且返回常量引用
+class StrVec {
+public:
+    string& operator[](size_t n) {return elements[n]; }
+    const string& operator[](size_t n) const {
+        return elements[n];
+    }
+private:
+    string* elements;
+};
+(14.27)
+class StrBlobPtr {
+public:
+    //前置版本
+    StrBlobPtr& operator++() {
+        check(curr, "increment past end of StrBlobPtr");
+        ++curr;
+        return *this;
+    }
+    StrBlobPtr& operator--() {
+        --curr;
+        check(curr, "decrement past begin of StrBlobPtr");
+        return *this;
+    }
+    //后置版本
+    StrBlobPtr operator++(int) {
+        StrBlobPtr ret = *this;
+        ++*this;
+        return ret;
+    }
+    StrBlobPtr operator--(int) {
+        StrBlobPtr ret = *this;
+        --*this;
+        return ret;
+    }
+};
+(14.28)
+StrBlobPtr operator+(int n) {
+    StrBlobPtr ret = *this;
+    ret.curr += n;
+    check(ret.curr, "increment error");
+    return ret;
+}
+StrBlobPtr operator-(int n) {
+    StrBlobPtr ret = *this;
+    ret.curr -= n;
+    check(ret.curr, "decrement error");
+    return ret;
+}
+(14.29)
+因为递增和递减会改变当前对象值
+(14.30)
+class ConstStrBlobPtr{
+public:
+    const string& operator*() const {
+        auto p = check(curr, "dereference past end");
+        return (*p)[curr];
+    }
+    const string* operator->() const {
+        return & this->operator*();
+    }
+};
+(14.31)
+因为StrBlobPtr类的成员有拷贝构造函数、赋值运算符及析构函数，不需要再次声明定义。
+(14.32)
+class Test {
+public:
+    string* operator->() const {
+        return sbp->operator->();
+    }
+private:
+    StrBlobPtr *sbp;
+};
+(14.33)
+一个类可以定义多个不同版本的调用运算符，其参数数量可以为0或任意正整数
+(14.34)
+template <typename T>
+class ite {
+public:
+    T operator(T t1, T t2, T t3) {
+        return t1 ? t2 : t3;
+    }
+};
+(14.35)
+(14.36)
+(14.37)
+(14.38)
+(14.39)
+(14.40)
+(14.41)
+如果是简单的判断逻辑的话，更愿意使用lambda，感觉使用类有点大材小用了
+(14.42)
+(14.43)
+(14.44)
+(14.45)
+string 应该返回 bookID
+double 应该返回 revenue
+(14.46)
+不应该，因为Sales_data中的成员函数都不是唯一属性，三个成员函数结合在一起组成Sales_data；
+如果定义了需要被声明成explicit，防止隐式转换产生错误。
+(14.47)
+operator const int(); 表示将对象定义成const int类型并返回
+operator int() const; 表示改函数是const的，返回的是int类型
+(14.48)
+可以为Date提供一个bool类型的转换云算符，检查日期是否有效；
+bool的类型转换通常用在条件部分，因此operator bool一般定义成explicit的
+(14.49)
+(14.50)
+ex1是int类型，所以ldObj需要转换成int，但是ldObj没有直接转换的，产生二义性
+ex2是float类型，而ldObj有转换float类型的转换，调用operator float()转换
+(14.51)
+会优先调用标准类函数
+(14.52)
+ld = si + ld;
+因为SmallInt和LongDouble不能互相转换，si会转换成int，LongDouble会转换成float或double，产生二义性；
+ld = ld + si;
+SmallInt和LongDouble不能互相转换，但是LongDouble中operator+接受为SmallInt类型的参数
+所以会调用LongDouble的operator+
+(14.53)
+不合法，候选操作:
+operator+(int, double)
+SmallInt operator+(const SmallInt&, const SmallInt&)
+应该改为:
+double d = static_cast<double>(s1) + 3.14;

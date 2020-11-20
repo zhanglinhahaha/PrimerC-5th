@@ -1,0 +1,17 @@
+从需求入手,理清需要完成的任务
+利用多重标准库设施,实现要求
+
+vector<string> 保存整个输入文件的拷贝,每行保存为vector中的一个元素
+istringstream 将每行分解为单词
+set 保存单词出现的行号;保证只出现一次,并且行号以升序保存
+map 将每个单词与它出现的行号set关联起来
+
+抽象类
+TextQuery 保存输入文件的类;包含vector和map;读取文件的构造函数以及执行查询的操作;
+QueryResult 保存查询结果的类;执行打印操作
+
+类之间共享
+QueryResult 要输出的数据都保存在TextQuery类中
+使用shared_ptr实现数据共享
+
+

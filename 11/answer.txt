@@ -1,0 +1,96 @@
+(11.1)
+map是关键字-值对的集合。vector是值的集合。
+map是关联容器，高效实现“按值访问元素”。容器里的元素是按关键字值存储的，关键字和元素数据建立对应关系。底层数据结构是红黑树，哈希表等，可高效地实现按关键字查找、添加、删除等操作。
+vector是顺序容器，元素是按顺序存储。操作是按位置进行的。
+(11.2)
+vector 适用于顺序的添加，非大量频繁的删除操作
+list 适用于大量的删除操作
+deque 适用于两头添加的操作
+set 适用于判断是否存在的操作
+map 适用于键值对的操作
+(11.3)
+(11.4)
+(11.5)
+map 用来键值对的操作
+set 用来判断某个值是否存在
+(11.6)
+set 可以快速的判断某个值是否存在
+list 则是按位置或者顺序对里面的值进行访问操作
+(11.7)
+(11.8)
+(11.9)
+(11.10)
+关联容器对关键字类型有一些限制。对于有序容器map，multimap，set，multiset，关键字类型必须定义元素比较的方法。
+(11.11)
+回顾:
+decltype((variable))的结果永远是引用
+而decltype(variable)只有当variable本身就是一个引用时，才是引用,引用必须被初始化
+decltype(f()) sum = x; //sum的类型就是函数f的返回类型
+typedef a b; 给a取个别名为b
+可以利用类型别名，
+typedef bool (*pf)(const Sales_data &lhs, const Sales_data &rhs);
+multiset<Sales_data, pf> bookstore(compareIsbn);
+(11.12)
+(11.13)
+(11.14)
+(11.15)
+map<int, vector<int>> test;
+key_type : int
+mapped_type : vector<int>
+value_type : pair<const int, vector<int>>
+(11.16)
+(11.17)
+因为set的迭代器是const的，只允许访问元素
+所以前两个非法，后面两个合法
+(11.18)
+map<const string, size_t>::iterator
+(11.19)
+multiset<Sales_data, pf>::iterator iter = bookstore.begin();
+(11.20)
+(11.21)
+首先是在map word_count插入值
+然后 word_count.insert({word,0}).first 是指向word_count[word]的迭代器
+最后将word_count[word]值增加1
+等价于上一题的写法
+(11.22)
+参数类型: pair<string, vector<int>>
+返回类型: pair<map<string, vector<int>>::iterator, bool>
+(11.23)
+(11.24)
+先创建一个关键字为0，值为0的pair类元素。然后将该关键字的对应的值赋值为1。
+(11.25)
+v是一个空的容器，用下标访问它的非法位置0的元素会引发错误造成系统崩溃。
+(11.26)
+对map进行下标操作的类型是该map的key_type
+下标运算符返回的类型是该map的mapped_type
+eg.map<string, int> msi;可以利用string类型的对msi进行下标操作，返回的类型为int类型
+(11.27)
+只关心一个特定元素是否已在容器中，find是最佳选择。
+对于不允许重复关键字的容器find和count作用是一样的。
+对于允许重复关键字的容器，count会统计有多少个元素相同的关键字。
+(11.28)
+(11.29)
+接受一个关键字，返回一个迭代器
+lower_bound();指向第一个具有给定关键字的元素
+upper_bound();指向最后一个匹配给定关键字的元素之后的位置
+若元素不存在，返回一个相等的迭代器，指向一个不影响排序的关键字插入位置。
+
+接受一个关键字，返回一个迭代器pair
+equal_range();若存在，第一个迭代器指向第一个与关键字匹配的元素，第二个迭代器指向最后一个匹配元素之后的位置。若未找到匹配元素，则两个迭代器都指向关键字可以插入的位置。
+(11.30)
+pos.first代表与关键字匹配元素的迭代器
+pos.first->second代表该关键字指向的值
+(11.31)
+(11.32)
+(11.33)
+(11.34)
+会使得本来不存在转换的值，经过下标操作创建该值存到map中
+(11.35)
+当key不存在的时候，这两种情况都会是创建
+但是当key已经存在的时候，第一种情况是替换key的value，而第二种则是什么也不会做
+(11.36)
+例子中已经进行了判断，如果没有对应的value，则会抛出runtime_error
+(11.37)
+无序容器不需要维护元素的排序，在性能测试和调优工作有着很好的效果。如果不是必须对关键字排序，用无序容器有着更好的性能。
+(11.38)
+略略略了，只需要把map改成unordered_mao即可

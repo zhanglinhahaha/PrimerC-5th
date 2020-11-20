@@ -1,0 +1,27 @@
+switch内部的变量定义
+可以定义变量，但是不能够初始化。
+string 定义的时候会有隐式初始化，所以也不可定义string
+
+a>
+case和default后面缺少break
+b>
+ix需定义在switch之前
+c>
+case不能用逗号表示,需改为case 1 : case 3 : case 5 ...
+d>
+case后面需要是常量表达式,应该为const unsigned ival = 512, jval = 1024, kval = 4096;
+
+a>
+ix作用域只在for中,需要将ix定义在for前面,if才能用
+b>
+for里面语句为空的时候也需要加上分号
+c>
+死循环
+
+a>
+do 后面的语句需要用花括号
+b>
+= 赋值语句,始终为真
+== 才是判断语句
+c>
+只要ival不为0,一直循环

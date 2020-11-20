@@ -1,0 +1,200 @@
+(16.1)
+定义：编译器处理过程，用实际的模板实参来生成模板的一个特殊实例，其中参数被替换为对应的实参。
+当函数模板被调用时，会自动根据传递给它的实参来实例化。
+而使用类模板时，则需要我们提供显示模板实参。
+当调用函数模板时，编译器通常用函数实参来为推断模板实参。
+编译器用推断出的模板参数来实例化一个特定版本的函数。
+当编译器实例化一个模板时，它使用实际的模板实参代替对应的模板参数来创建出模板的一个“实例”。
+(16.2)
+#include <functional>//less<>的头文件
+template <typename T>
+int compare(const T &v1, const T &v2) {
+    if(std::less<T>()(v1, v2)) return -1;
+    if(std::less<T>()(v2, v1)) return 1;
+    return 0;
+}
+(16.3)
+error: no match for ‘operator<’ (operand types are ‘const Sales_data’ and ‘const Sales_data’)
+(16.4)
+(16.5)
+(16.6)
+begin获取一个数组的引用，指向数组中的第一个元素
+end获取数组的引用和大小，指向这个引用加上数组的大小
+(16.7)
+(16.8)
+因为大多数类通常会定义"!="而不是"<"，使用"!="会减少错误
+(16.9)
+类模板：模板定义，可以从它实例化出特定的类。类模板的定义以关键字template开始，
+后面跟尖括号对<>，其内为一个用逗号分隔的一个或多个模板参数的列表，随后是类的定义
+函数模板：模板定义，可从它实例化出特定函数。函数模板的定义以关键字template开始，
+后面跟尖括号对<>，其内为一个用逗号分隔的一个或多个模板参数的列表，随后是函数的定义
+(16.10)
+当一个类模板实例化时，编译器会使用模板实参来实例化出特定的类，它会重写类模板，
+将模板参数的每个实例替换为给定的模板实参，每个实例都形成一个独立的类。
+(16.11)
+template <typename elemType> class ListItem;
+template <typename elemType> class List {
+    List();
+    List(const List&);
+    List& operator=(const List&);
+    ~List();
+    void insert(ListItem<elemType> *ptr, elemType value);
+private:
+    ListItem<elemType> *front, *end;
+};
+(16.12)
+(16.13)
+添加了相等运算符和小于运算符
+(16.14)
+(16.15)
+添加了输入和输出友元函数
+(16.16)
+(16.17)
+在模板参数列表中，typename和class两个关键字的含义相同，都是表明模板参数是一个类型。
+但是当我们希望通知编译器一个名字表示类型时，必须使用关键字typename，而不能使用class。
+(16.18)
+a>
+模板参数列表每个参数都需要加上typename或class
+template <typename T, typename U, typename V> void f1(T, U, V);
+b>
+函数内的形参名称和模板参数列表名称同名，不允许重声明模板参数
+template <typename T> T f2(T&);
+c>
+函数在定义的时候才能指定为inline
+template <typename T> T foo(T, unsigned int*);
+d>
+函数没有返回类型
+template <typename T> void f4(T, T);
+e>
+合法，但是模板参数内部的Ctype是模板参数的类型，而非char
+(16.19)
+
+(16.20)
+(16.21)
+(16.22)
+用法大致如下，就不再全部改写了。
+unique_ptr<int, DebugDelete> p(new int, DebugDelete());
+unique_ptr<string, DebugDelete> sp(new string, DebugDelete());
+(16.23)
+当shared_ptr计数减少到0的时候，会调用DebugDelete()函数删除指针
+(16.24)
+template <typename T, typename It>
+Blob<T>::Blob(It b, It e): data(make_shared<vector<T>>(b, e)) { }
+(16.25)
+extern template class vector<string>
+实例化声明，当编译器遇到extern模板声明时，它不会在本文件中生成实例化代码。
+并且表示承诺在程序的其他位置有该实例化的一个非extern声明(定义)
+template class vector<Sales_data>
+用Sales_data实例化vector
+(16.26)
+不可以；因为在一个类模板的实例化定义中，所用的类型必须能用于模板的所有成员函数。
+(16.27)
+a>
+char 实例化模板
+b>
+double 实例化模板
+c>
+int 实例化模板
+d>
+存在该实例的定义，不需要再次实例化
+e>
+存在该实例的定义，不需要再次实例化
+f>
+string 实例化模板
+(16.28)
+(16.29)
+(16.30)
+(16.31)
+(16.32)
+编译器使用函数调用中的实参类型来寻找模板实参，用这些模板实参生成的函数版本与给定的函数调用最为匹配
+(16.33)
+const转换：可以将一个非const对象的引用(或指针)传递给一个const的引用(或指针)形参
+数组或函数指针转换：如果函数形参不是引用类型，则可以对数组或函数类型的实参应用正常的指针转换；
+一个数组实参可以转换成一个指向其首元素的指针；一个函数实参可以转换成一个该函数类型的指针；
+(16.34)
+乍一看，以为是一样的。但实则不同
+a> char[3] 和 char[6], 不合法，会报错
+b> char[4] 和 char[4], T的类型为char*
+(16.35)
+a> 合法，T的类型为char
+b> 合法，T的类型为double，因为float可以转换成int
+c> 合法，T的类型为char
+d> 不合法
+(16.36)
+a> T的类型为int*
+b> T1和T2的类型都为int*
+c> T的类型为const int*
+d> T1和T2的类型都为const int*
+e> 不合法，类型不一致
+f> T1类型为int*,T2类型为const int*
+(16.37)
+(16.38)
+make_share如果不提供显示模板实参，则无法给参数分配适当的内存
+(16.39)
+(16.40)
+函数合法，但是对于传递的实参类型有限制，实参类型必须支持operator+(int)操作。
+(16.41)
+(16.42)
+a> T的类型为int&, val则是int& &&折叠成int&
+b> T的类型为const int&, val则是const int& &&折叠成const int&
+c> T的类型为int, val则是int&&
+(16.43)
+因为 i = ci 是一个赋值语句，返回一个左值。所以和上面的a一样，T是int&, val是int&
+(16.44)
+为T时:
+a>T: int
+b>T: int, const会被忽略
+c>T: int, i*ci返回一个右值将会被复制给T
+为const T&时:
+a>T: int
+b>T: int
+c>T: int
+(16.45)
+对于42，是一个右值，所以T的类型是int&&，而val类型是int&& &&将会被折叠为int&&，所以vector<int&&>合法。
+对于int，是一个左值。所以T的类型是int&，而val类型是int& &&将被折叠为int&，所以vector<int&>非法。
+(16.46)
+在每次迭代中，解引用操作符*返回一个左值，然后这个左值通过move操作变成右值；
+因为成员函数构造函数使用右值引用而不是左值引用。
+(16.47)
+(16.48)
+(16.49)
+(16.50)
+(16.51)
+(16.52)
+(16.53)
+(16.54)
+(16.55)
+(16.56)
+(16.57)
+可变参数版本的errorMsg参数不仅可以有不同的参数个数，也可以有不同的参数类型。
+(16.58)
+(16.59)
+(16.60)
+make_shared应该是一个可变参数模板函数，它将所有的参数转发给底层构造函数，
+这些构造函数在动态内存中分配和初始化一个对象。然后通过包装原始指针构建一个shared_ptr。
+(16.61)
+(16.62)
+namespace std {
+    template<>
+    struct hash<Sales_data> {
+        typedef size_t result_type;
+        typedef Sales_data argument_type;
+        size_t operator()(const Sales_data& s) const {
+            return hash<string>()(s.bookNo) ^
+                   hash<unsigned>()(s.units_sold) ^
+                   hash<double>()(s.revenue);
+        }
+    };
+}
+
+unordered_multiset<Sales_data> SDset;
+SDset.emplace("TLBB", 5, 6.66);
+(16.63)
+
+(16.64)
+(16.65)
+(16.66)
+重载会改变函数匹配，但是特例化并不会
+(16.67)
+不影响，定义函数模板的特例化版本时，本质上是接管了编译器的工作。
+所以特例化版本本质是是一个实例，而不是函数名的一个重载版本，不影响函数匹配。

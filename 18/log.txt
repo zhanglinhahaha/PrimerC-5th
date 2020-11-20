@@ -1,0 +1,50 @@
+异常处理
+处理代码应该首先打印异常相关的错误信息，然后调用abort(<cstdlib>)终止函数
+noexcept,在typedef或类型别名不能出现。需要跟在const及引用限定符之后，在final override或虚函数=0之前
+标准库异常类的继承体系
+exception
+    bad_cast
+    bad_alloc
+    runtime_error
+        overflow_error
+        underflow_error
+        range_error
+    logic_error
+        domain_error
+        invalid_argument
+        out_of_range
+        length_error
+
+命名空间
+定义:
+namespace cplusplus_primer {
+    class Sales_data { /* ... */};
+    Sales_data operator+(const Sales_data&, const Sales_data&);
+    class Query { /* ... */};
+    class Query_base { /* ... */};
+}
+
+cplusplus_primer::Query q = cplusplus_primer::Query("hello");
+全局命名空间
+::member_name
+嵌套的命名空间
+namespace test {
+    namespace test1 {
+        ...
+    }
+    namespace test2 {
+        ...
+    }
+    ...
+}
+内联命名空间
+inline namespace test { }
+inline 必须出现在命名空间第一次定义的地方，后续再打开命名空间的时候可以写inline，也可以不写
+未命名的命名空间
+定义的变量拥有静态生命周期。可以不连续但是不能跨文件
+命名空间的别名
+namespace primer = cplusplus_primer;
+namespace Qlib = cplusplus_primer::QueryLib;
+
+多重继承
+从多个直接基类中产生派生类的能力，多重继承的派生类继承了所有父类的属性。

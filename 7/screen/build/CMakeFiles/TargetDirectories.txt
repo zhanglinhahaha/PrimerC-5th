@@ -1,0 +1,3 @@
+/home/zl/zhanglinDemo/cpp/primerc++/7/screen/build/CMakeFiles/rebuild_cache.dir
+/home/zl/zhanglinDemo/cpp/primerc++/7/screen/build/CMakeFiles/edit_cache.dir
+/home/zl/zhanglinDemo/cpp/primerc++/7/screen/build/CMakeFiles/screen.dir

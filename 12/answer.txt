@@ -1,0 +1,85 @@
+(12.1)
+b1和b2共享动态内存vector<string>，代码的结尾，b2离开作用域，b2被销毁，b1包含四个元素。
+(12.2)
+
+(12.3)
+不需要，因为push_back和pop_back都需要对vector元素进行增删操作，并不仅仅只是访问元素。
+(12.4)
+因为check函数是private的，只有StrBlob内部的函数才能调用它，并且在函数内部使用的时候已经确保i的值不会出现问题
+(12.5)
+未编写接受一个初始化列表参数的显示构造函数，意味着可以进行列表向StrBlob的隐式类型转换，也就是，在需要StrBlob的地方（如函数的参数），可以使用列表进行替代。而且，可以进行拷贝形式的初始化（如赋值）。这令程序编写更为简单方便。
+但这种隐式转换并不总是好的。例如，列表中可能并非都是合法的值。再如，对于接受StrBlob的函数，传递给它一个列表，会创建一个临时的StrBlob对象，用列表对其初始化，然后将其传递给函数，当函数完成后，此对象将被丢弃，再也无法访问了。对于这些情况，我们可以定义显式的构造函数，禁止隐式类类型转换。
+(12.6)
+(12.7)
+(12.8)
+当一个程序用光了可用的内存，new表达式就会失败。如果不能分配内存失败，则会抛出一个类型bad_alloc的异常，可用使用下面的方式阻止抛出异常：
+int *p2 = new (nothrow) int;//分配失败的时候返回一个空指针
+如果该函数是想返回一个类型为int的指针，应该修改为int *b() {return new int;}
+如果该函数是想判断是否new成功，应该改为 bool b() {return new (nothrow) int;}
+(12.9)
+int *q = new int(42)/*new一个指针q指向42*/, *r = new int(100)/*new一个指针指向100*/;
+r = q;//指针r指向q
+//由于r指向q之后，之前分配指向100的内存存在但无法再访问，并且也没有delete，造成内存泄漏
+auto q2 = make_shared<int>(42), r2 = make_shared<int>(100);//创建两个智能指针q2和r2分别指向42和100
+r2 = q2;//r2指向q2，r2之前指向的内存被销毁释放
+(12.10)
+正确。显示构造智能指针，计数加1
+函数调用时会创建一个临时的智能指针，计数加1
+函数结束，临时指针被销毁，计数减1
+最终计数还是1，不改变
+(12.11)
+错误，因为p.get()不会使计数加1，但是函数结束会被销毁计数减1计数为0，内存被释放
+(12.12)
+a 合法，正确的用法
+b 不合法，不允许隐式替换
+c 不合法，不允许隐式替换
+d 合法，但是内存会被释放，p变成一个空悬指针
+(12.13)
+会删除sp管理的内存，使得sp变成空悬指针
+(12.14)
+struct destination;
+struct connection;
+connection connect(destination*);
+void disconnect(connection);
+void end_connection(connection *p) {disconnect(*p);}
+
+void f(destination &d) {
+    connection c = connect(&d);
+    shared_ptr<connection> p (&c, end_connection);
+}
+(12.15)
+void f(destination &d) {
+    connection c = connect(&d);
+    shared_ptr<connection> p (&c, [](connection *p){disconnect(*p););
+}
+(12.16)
+error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = int; _Dp = std::default_delete<int>]’
+正确用法为：
+(12.17)
+(a) 不合法,不能用非指针类型初始化。
+(b) 合法。编译成功，运行出错。因为它用一个普通的int变量的地址初始化p1，p1销毁时会释放此内存，其行为是未定义的。
+(c) 合法。
+(d) 合法。和b一样的问题
+(e) 合法。
+(f) 合法。但是有问题。会造成两个unique_ptr指向相同的内存地址。当其中一个unique_ptr被销毁时（或者被reset释放对象时），该内存被释放，另一个unique_ptr会变成空悬指针。
+(12.18)
+因为shared_ptr是允许多个指针管理一个内存，为了对其他指针负责，所以不允许release()
+(12.19)
+(12.20)
+(12.21)
+这样写尽可能的缩短了代码，但是可读性降低了。
+(12.22)
+(12.23)
+(12.24)
+(12.25)
+delete [] pa;
+(12.26)
+(12.27)
+(12.28)
+(12.29)
+智能指针使用规范
+不使用相同的内置指针初始化或reset多个智能指针
+不delete get()返回的指针
+不使用get()初始化或reset另一个智能指针
+如果使用get()返回的指针，当最后一个对应的智能指针销毁后，你的指针就变为无效了
+如果使用的智能指针管理的资源不是new分配的内存，记住传递给它一个删除器

@@ -1,0 +1,73 @@
+(18.1)
+a>
+terminate called after throwing an instance of 'std::range_error'
+  what():  error
+b>
+throw *p:
+terminate called after throwing an instance of 'std::exception'
+  what():  std::exception
+throw p:
+terminate called after throwing an instance of 'std::exception*'
+(18.2)
+vector对象v会在它的析构函数被销毁;
+而动态分配的对象数组将无法被正确的销毁;
+文件流对象in会被销毁;
+(18.3)
+第一种方式是使用智能指针；第二种方法是使用类管理，在类的析构函数中销毁对象。
+(18.4)
+(18.5)
+(18.6)
+(18.7)
+处理构造函数初始值异常的唯一方式是将构造函数写成函数try语句块。
+template <typename T>
+Blob<T>::Blob(std::initializer_list<T> il) try:
+    data(std::make_shared<std::vector<T>>(il)) {
+        //...
+    }catch(const std::bad_alloc &e) { handle_out_of_memory(e); }
+(18.8)
+略了
+(18.9)
+(18.10)
+(18.11)
+因为what是虚函数，为了是其派生类可以更好的去定义。
+(18.12)
+略了
+(18.13)
+未命名的命名空间中定义的变量拥有静态生命周期，它们在第一次使用前创建，并且知道程序结束才销毁
+未命名的命名空间仅在特定的文件内部有效，其作用范围不会横跨多个不同的文件
+在文件中进行静态声明的做法已经被c++标准取消了，现在的做法应该是用未命名的命名空间
+(18.14)
+mathLib::MatrixLib::matrix mathLib::MatrixLib::operator* (const matrix&, const matrix&);
+(18.15)
+using 声明语句一次只引入命名空间的一个成员；
+using 指示后面是关键字 namespace 以及命名空间的名字，一次引入命名空间的所有成员；
+using 指示只推荐在命名空间本身的实现文件中使用。
+(18.16)
+使用 using 声明时，
+位置1：
+error: ‘ivar’ is already declared in this scope
+ using Exercise::ivar;
+位置2：
+error: redeclaration of ‘double dvar’
+     double dvar = 3.1416;
+使用 using 指示时，
+位置1：
+error: reference to ‘ivar’ is ambiguous
+     ++ivar;
+位置2：
+error: reference to ‘ivar’ is ambiguous
+     ++ivar;
+(18.17)
+(18.18)
+(18.19)
+(18.20)
+(18.21)
+(18.22)
+(18.23)
+(18.24)
+(18.25)
+(18.26)
+(18.27)
+(18.28)
+(18.29)
+(18.30)

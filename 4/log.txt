@@ -1,0 +1,27 @@
+其他隐式类型转换
+数组转换成指针
+int ia[10];
+int *p = ia;
+p转换成指向数组首元素的指针
+当被当成decltype的参数，或者取地址符、sizeof及typeid等运算符的对象，或者用一个引用初始化数组都不会转换
+指针的转换
+0和nullptr能转换成任意指针类型
+指向任意非常量的指针能转换成void*
+指向任意对象的指针能转换成const void*
+转换成布尔类型
+如果指针或者算术类型的值为0，转换结果为false，否则为true
+转换成常量
+允许将指向非常量类型的指针转换成指向相应的常量类型的指针或者引用。反之不可
+类类型定义的转换
+由编译器自动执行的转换
+
+显示转换
+命名的强制类型转换
+cast-name<type>(expression)
+type是转换的目标类型，如果type是引用类型，结果是左值
+expression是要转换的值
+cast-name包括：
+static_cast 只要不包含底层const，都可以使用static_cast,尤其是将江大的算术类型赋值给较小的类型
+dynamic_cast
+const_cast 只能改变运算对象的底层const，改变对象的常量属性
+reinterpret_cast 为运算对象的位模式提供较低层次上的重新解释

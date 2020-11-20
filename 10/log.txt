@@ -1,0 +1,79 @@
+auto iter = find(vec.cbegin(), vec.cend(), val);
+//if not present, iter = vec.cend();
+
+<numeric>
+int sum = accumulate(vec.cbegin(), vec.cend(), 0);
+//第三个参数决定函数的返回值类型
+
+bool flag = equal(r1.cbegin(), r1.cend(), r2.cbegin());
+//确保第二个序列至少与第一个序列一样长
+
+fill(vec.begin(), vec.end(), 0); //将每个元素重置为0
+fill_n(vec.begin(), vec.size(), 0); //将每个元素重置为0
+
+<iterator>
+auto iter = back_inserter(vec);
+fill_n(back_inserter(vec), 10, 0);
+
+auto ret = copy(begin(a1), end(a1), a2);//把数组a1的内容拷贝到a2
+//ret == end(a2)
+
+replace(ilst.begin(), ilst.end(), 0, 42);//将所有值为0的元素改为42
+
+replace_copy(ilst.cbegin(), ilst.cend(), back_inserter(ivec), 0, 42);//拷贝一份ivec,将ilst中值为0的元素替换成42
+
+sort(words.begin(), words.end());//按字典序排序
+auto end_unique = unique(words.begin(), words.end());//返回指向不重复区域之后一个位置的迭代器,消除相邻的重复项
+words.erase(end_unique, words.end());
+
+
+定制操作
+1>谓词
+bool isShorter(const string &s1, const string &s2) {
+    return s1.size() < s2.size();
+}
+sort(words.begin(), words.end(), isShorter);//按长度由短至长排序
+//第三个参数是 谓词 , 谓词是一个可调用的表达式,返回结果是一个能用做条件的值
+
+stable_sort()//维持相等元素的原有顺序
+
+2>lambda
+lambda表达式
+[capture list](parameter list) -> return type {function body}
+eg:
+[]{return 42;};
+[](const string &s1, const string &s2) {return s1.size() < b.size();};
+[sz](const string &a) {return a.size() >= sz;};//[]捕获列表中的名字是它所在的函数中定义的,可以有多个以逗号分开;lambda可以直接使用局部static变量和它所在函数之外声明的名字
+[](int i) -> int {if(i < 0) return -i; else return i;};
+
+auto wc = find_if(words.begin(), words.end(), [sz](const string &a) {return a.size() >= sz;});
+//如果不存在,wc = words.end();
+auto count = words.end() - wc;
+for_each(wc, words.end(), [](const string &a){count << s << " ";});cout << endl;
+
+3>bind
+<functional>
+bind 的一般形式
+auto newCallable = bind(callable, arg_list);
+eg:
+bool check_size(const string &s, string::size_type sz) {
+    return s.size() >= sz;
+}
+auto check6 = bind(check_size, _1, 6);
+string s = "hello";
+bool b1 = check6(s);//调用check_size(s, 6);
+
+auto wc = find_if(words.begin(), words.end(), bind(check_size, _1, sz));
+
+bind(isShorter, _2, _1);//means isLongter
+
+ref()返回一个对象,包含给定的引用,此对象可拷贝
+
+1>插入迭代器
+back_inserter, creat a iterator with push_back which is useful at first
+front_inserter, creat a iterator with push_front which is useful at first
+inserter,
+2>流迭代器
+istream_iterator 输入流
+ostream_iterator 输出流
+

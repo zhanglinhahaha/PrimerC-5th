@@ -1,0 +1,26 @@
+顺序容器
+vector 可变数组大小
+deque 双端队列
+list 双向链表
+forward_list 单向链表
+array 固定大小数组
+string 可变大小字符串
+容器适配器
+stack 栈适配器
+eg:
+stack<int> s;
+s.pop;
+s.top;
+s.push(item);
+queue 队列适配器
+eg:
+queue<int> q;
+q.pop();
+q.front();
+q.back();
+q.push(item);
+
+
+
+调用erase函数后，返回的迭代器指向序列下一个元素
+调用insert函数后，返回的迭代器指向新插入的元素，在插入迭代器之前

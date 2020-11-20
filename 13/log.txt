@@ -1,0 +1,78 @@
+拷贝构造函数
+第一个参数必须是一个引用类型
+Foo();//默认构造函数
+Foo(const Foo&);//拷贝构造函数
+合成拷贝构造函数
+eg.
+Sales_data::Sales_data(const Sales_data &org):
+    bookNo(org.bookNo),
+    units_sold(org.units_sold),
+    revenue(org.revenue) { }
+
+移动构造函数
+eg.
+StrVec::StrVec(StrVec &&s) noexcept
+    :elements(s.elements), first_free(s.first_free), cap(s.cap) {
+    s.elements = s.first_free = s.cap = nullptr;
+}
+
+拷贝赋值运算符
+Foo& operator= (const Foo&);//赋值运算符
+合成拷贝赋值运算符
+eg.
+Sales_data& Sales_data::operator=(const Sales_data &rhs) {
+    bookNo = rhs.bookNo;
+    units_sold = rhs.units_sold;
+    revenue = rhs.revenue;
+    return *this;
+}
+
+移动赋值运算符
+eg.
+StrVec &StrVec::operator=(StrVec &&rhs) noexcept {
+    if(this != &rhs) {
+        free();
+        elements = rhs.elements;
+        first_free = rhs.first_free;
+        cap = rhs.cap;
+        rhs.elements = rhs.first_free = rhs.cap = nullptr;
+    }
+}
+
+析构函数
+~Foo();//析构函数 不能被重载
+合成析构函数
+eg.
+~Sales_data() { }
+
+tips
+需要析构函数的类也需要拷贝和赋值操作
+需要拷贝构造函数的类也需要拷贝赋值运算符，反正亦然，但不必需析构函数
+
+可以通过 =default 显式的要求编译器生成合成的版本
+可以通过 =delete 显式的删除函数，必须在第一次声明的时候使用，不能删除析构函数
+
+对于常规引用，称为左值引用，不能将其绑定到要求转换的表达式、字面常量或是返回右值的表达式
+右值引用，可以将一个右值引用绑定到这类表达式上，但不能将一个右值引用直接绑定到一个左值上
+eg.
+int i = 42;
+int &r = i;//左值引用
+int &&rr = i;//错误，右值引用不能直接绑定到一个左值上
+int &r2 = i * 42;//错误，i*42是一个右值
+const int &r3 = i * 42;//可以将一个const的引用绑定到一个右值上
+int &&rr2 = i * 42;//右值引用
+
+变量是左值
+<utility> move
+int &&rr1 = 42;
+int &&rr2 = rr1;//error
+int &&rr3 = std::move(rr1);//ok
+
+noexcept 不抛出异常声明
+
+只有当一个类没有定义自己版本的拷贝控制成员
+且它的所有数据成员都能移动构造或移动赋值时
+编译器才会合成移动构造函数或移动赋值运算符
+
+
+
