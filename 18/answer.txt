@@ -59,15 +59,91 @@ error: reference to ‘ivar’ is ambiguous
      ++ivar;
 (18.17)
 (18.18)
+Swap 是一个由标准库定义的模板函数。
+通过声明我们使用的是 std::swap 函数作用域中的所有 swap 用法, 使用时将在标准库中为它的实参类型查找匹配模板。
+如果 mem1 是 string 类型，它将使用 string 类型的标准库函数。
+如果 mem1 是 int 类型，它将使用 int 类型的标准库模板版本。
 (18.19)
+该函数将为该特定调用使用 swap 匹配的 std 版本, 但是也不一定是使用 swap 的标准库版本。
 (18.20)
+>改变之前
+compute() 不匹配, 会error
+compute(const void *) 可匹配,将 0 转换为 void* 类型
+compute(int) 完美匹配, 不用类型转换
+compute(double, double = 3.4) 可匹配, 将 0 转换为 double 类型
+compute(char*, char* = 0) 可匹配, 将 0 转换为 char* 类型
+>改变之后
+compute() 不匹配
+compute(const void *) 可匹配
 (18.21)
+a>CADVehicle 公有继承 CAD, 私有继承 Vehicle, 一般情况下不会出问题，但是 CADVehicle 不能隐式转换为　Vehicle.
+b>错误，不能继承相同的基类．
+c>没有问题．
 (18.22)
+class A; class B; class C;class X; class Y; class Z; class MI;
 (18.23)
+都可以
 (18.24)
+ZooAnimal *pb = new Panda ("ying_yang");
+pb->print();//正确
+pb->cuddle();//错误
+pb->highlight();//错误
+delete pb;//正确
 (18.25)
+---->>> a <<<----
+MI
+---->>> b <<<----
+MI
+---->>> c <<<----
+MI
+---->>> d <<<----
+~MI
+~D2
+~Base2
+~D1
+~Base1
+---->>> e <<<----
+~MI
+~D2
+~Base2
+~D1
+~Base1
+---->>> f <<<----
+~MI
+~D2
+~Base2
+~D1
+~Base1
 (18.26)
+修改结构体 MI;
+添加
+void print(int x) { Base1::print(x); }
 (18.27)
+a>MI派生类的所有属性都是可见的，除了那些私有的。
+b>是的，基类中任何重复且非私有的名字都可以通过添加作用域操作符在foo中访问。
+c>dval = Base1::dval + Derived::dval;
+d>Base2::fval = *dvec.cbegin();
+e>Derived::sval[0] = Base1::cval;
 (18.28)
+除了 Derived2 类里面的 ival 以外, 其他类的访问都需要加限定符.
 (18.29)
+a>
+构造顺序:
+Class()
+Base()
+D1()
+D2()
+MI()
+Class()
+Final()
+析构顺序: 与构造顺序相反
+b>
+一个 Base, 两个 Class.
+c>
+a error: invalid conversion from ‘t29::Class*’ to ‘t29::Base*’; 不能把基类指针赋值到派生类
+b error: ‘t29::Class’ is an ambiguous base of ‘t29::Final’; Final 类有包含两个 Class 类,歧义
+c error: invalid conversion from ‘t29::Base*’ to ‘t29::MI*’; 和 a 一样的错误
+d right, 派生类指针可以给基类指针赋值
 (18.30)
+需要注意的一个问题就是虚基类(Base)的初始化是在最外层的派生类(Final)中进行的, 如果最外层的派生类没有明确的初始化虚基类,程序会自动调用虚基类的默认构造函数.
+
